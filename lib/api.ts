@@ -1,7 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 // N8N webhook endpoint
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca'
+const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://ganahari.app.n8n.cloud/webhook-test/b918489b-0898-4b69-a91d-eb7277ab9dca'
 
 export interface ProcessFileResponse {
   success: boolean
