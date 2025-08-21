@@ -1,7 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 // N8N webhook endpoint
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca'
+const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'http://165.22.215.117:5678/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca'
 
 export interface ProcessFileResponse {
   success: boolean
@@ -41,9 +41,12 @@ export async function processFile(file: File, token: string, prompt: string): Pr
     
     console.log('N8N Response Status:', response.status)
     console.log('N8N Response Headers:', response.headers)
+    console.log('Response Size:', response.headers.get('content-length'))
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorText = await response.text()
+      console.error('N8N Error Response:', errorText)
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
     }
     
     // Check if response is binary (PDF) or text
