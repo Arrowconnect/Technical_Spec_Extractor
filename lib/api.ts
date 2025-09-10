@@ -13,39 +13,30 @@ export interface ProcessFileResponse {
 
 export async function processFile(file: File, token: string, prompt: string): Promise<ProcessFileResponse> {
   try {
-    console.log('Sending file to N8N webhook:', N8N_WEBHOOK_URL)
+    const apiEndpoint = `${API_BASE_URL}/api/process-pdf`
+    console.log('Sending file to Vercel API route:', apiEndpoint)
     console.log('File details:', { name: file.name, size: file.size, type: file.type })
-    
-    // Test if N8N webhook is accessible
-    try {
-      const testResponse = await fetch(N8N_WEBHOOK_URL, { method: 'GET' })
-      console.log('N8N webhook test response:', testResponse.status)
-    } catch (testError) {
-      console.warn('N8N webhook test failed:', testError)
-    }
     
     const formData = new FormData()
     formData.append('file', file)
     formData.append('prompt', prompt)
     
-    // Using fetch instead of axios to avoid timeout issues
-    console.log('About to send request to:', N8N_WEBHOOK_URL)
+    console.log('About to send request to Vercel API route')
     
-    const response = await fetch(N8N_WEBHOOK_URL, {
+    const response = await fetch(apiEndpoint, {
       method: 'POST',
       body: formData,
-      // No timeout specified - let it run indefinitely
     })
     
     console.log('Request sent, waiting for response...')
     
-    console.log('N8N Response Status:', response.status)
-    console.log('N8N Response Headers:', response.headers)
+    console.log('API Response Status:', response.status)
+    console.log('API Response Headers:', response.headers)
     console.log('Response Size:', response.headers.get('content-length'))
     
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('N8N Error Response:', errorText)
+      console.error('API Error Response:', errorText)
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
     }
     
@@ -65,24 +56,14 @@ export async function processFile(file: File, token: string, prompt: string): Pr
         filename: file.name.replace('.pdf', '_processed.pdf')
       }
     } else {
-      // Handle text/JSON response
-      const responseData = await response.text()
-      console.log('N8N Response Data:', responseData)
-      
-      // Try to parse as JSON, fallback to text
-      let result = responseData
-      try {
-        const parsed = JSON.parse(responseData)
-        if (typeof parsed === 'object') {
-          result = JSON.stringify(parsed, null, 2)
-        }
-      } catch (e) {
-        // Keep as text if not JSON
-      }
+      // Handle text/JSON response from API route
+      const responseData = await response.json()
+      console.log('API Response Data:', responseData)
       
       return {
-        success: true,
-        result: result
+        success: responseData.success || true,
+        result: typeof responseData.result === 'object' ? JSON.stringify(responseData.result, null, 2) : responseData.result,
+        error: responseData.error
       }
     }
   } catch (error: any) {
@@ -94,9 +75,9 @@ export async function processFile(file: File, token: string, prompt: string): Pr
     if (error.name === 'AbortError' || error.message.includes('timeout')) {
       errorMessage = 'Request timed out. The file processing is taking longer than expected. Your N8N workflow may still be running.'
     } else if (error.message.includes('HTTP error')) {
-      errorMessage = `N8N Error: ${error.message}`
+      errorMessage = `API Error: ${error.message}`
     } else if (error.message.includes('fetch')) {
-      errorMessage = 'Could not connect to N8N webhook - make sure N8N is running'
+      errorMessage = 'Could not connect to processing service'
     } else {
       errorMessage = error.message
     }
