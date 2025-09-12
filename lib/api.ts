@@ -13,39 +13,18 @@ export interface ProcessFileResponse {
 
 export async function processFile(file: File, token: string, prompt: string): Promise<ProcessFileResponse> {
   try {
-    // For large files (>10MB), upload directly to N8N
-    const useDirectUpload = file.size > 10 * 1024 * 1024
+    // Upload all files directly to N8N for simplicity and to avoid timeouts
+    console.log('Uploading directly to N8N:', N8N_WEBHOOK_URL)
+    console.log('File details:', { name: file.name, size: file.size, type: file.type })
     
-    let response: Response
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('prompt', prompt)
     
-    if (useDirectUpload) {
-      console.log('File is large, uploading directly to N8N:', N8N_WEBHOOK_URL)
-      console.log('File details:', { name: file.name, size: file.size, type: file.type })
-      
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('prompt', prompt)
-      
-      response = await fetch(N8N_WEBHOOK_URL, {
-        method: 'POST',
-        body: formData,
-      })
-    } else {
-      const apiEndpoint = `${API_BASE_URL}/api/process-pdf`
-      console.log('Sending file to Vercel API route:', apiEndpoint)
-      console.log('File details:', { name: file.name, size: file.size, type: file.type })
-      
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('prompt', prompt)
-      
-      console.log('About to send request to Vercel API route')
-      
-      response = await fetch(apiEndpoint, {
-        method: 'POST',
-        body: formData,
-      })
-    }
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      body: formData,
+    })
     
     console.log('Request sent, waiting for response...')
     
