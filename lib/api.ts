@@ -16,6 +16,8 @@ export async function processFile(file: File, token: string, prompt: string): Pr
     // For large files (>10MB), upload directly to N8N
     const useDirectUpload = file.size > 10 * 1024 * 1024
     
+    let response: Response
+    
     if (useDirectUpload) {
       console.log('File is large, uploading directly to N8N:', N8N_WEBHOOK_URL)
       console.log('File details:', { name: file.name, size: file.size, type: file.type })
@@ -24,7 +26,7 @@ export async function processFile(file: File, token: string, prompt: string): Pr
       formData.append('file', file)
       formData.append('prompt', prompt)
       
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      response = await fetch(N8N_WEBHOOK_URL, {
         method: 'POST',
         body: formData,
       })
@@ -39,7 +41,7 @@ export async function processFile(file: File, token: string, prompt: string): Pr
       
       console.log('About to send request to Vercel API route')
       
-      const response = await fetch(apiEndpoint, {
+      response = await fetch(apiEndpoint, {
         method: 'POST',
         body: formData,
       })
