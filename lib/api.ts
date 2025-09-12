@@ -13,30 +13,47 @@ export interface ProcessFileResponse {
 
 export async function processFile(file: File, token: string, prompt: string): Promise<ProcessFileResponse> {
   try {
-    const apiEndpoint = `${API_BASE_URL}/api/process-pdf`
-    console.log('Sending file to Vercel API route:', apiEndpoint)
-    console.log('File details:', { name: file.name, size: file.size, type: file.type })
+    // For large files (>10MB), upload directly to N8N
+    const useDirectUpload = file.size > 10 * 1024 * 1024
     
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('prompt', prompt)
-    
-    console.log('About to send request to Vercel API route')
-    
-    const response = await fetch(apiEndpoint, {
-      method: 'POST',
-      body: formData,
-    })
+    if (useDirectUpload) {
+      console.log('File is large, uploading directly to N8N:', N8N_WEBHOOK_URL)
+      console.log('File details:', { name: file.name, size: file.size, type: file.type })
+      
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('prompt', prompt)
+      
+      const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        body: formData,
+      })
+    } else {
+      const apiEndpoint = `${API_BASE_URL}/api/process-pdf`
+      console.log('Sending file to Vercel API route:', apiEndpoint)
+      console.log('File details:', { name: file.name, size: file.size, type: file.type })
+      
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('prompt', prompt)
+      
+      console.log('About to send request to Vercel API route')
+      
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        body: formData,
+      })
+    }
     
     console.log('Request sent, waiting for response...')
     
-    console.log('API Response Status:', response.status)
-    console.log('API Response Headers:', response.headers)
+    console.log('Response Status:', response.status)
+    console.log('Response Headers:', response.headers)
     console.log('Response Size:', response.headers.get('content-length'))
     
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('API Error Response:', errorText)
+      console.error('Error Response:', errorText)
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
     }
     
@@ -56,9 +73,9 @@ export async function processFile(file: File, token: string, prompt: string): Pr
         filename: file.name.replace('.pdf', '_processed.pdf')
       }
     } else {
-      // Handle text/JSON response from API route
+      // Handle text/JSON response
       const responseData = await response.json()
-      console.log('API Response Data:', responseData)
+      console.log('Response Data:', responseData)
       
       return {
         success: responseData.success || true,

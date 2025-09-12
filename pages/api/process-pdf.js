@@ -29,9 +29,9 @@ export default async function handler(req, res) {
   try {
     console.log('Processing file upload through Vercel API route...');
 
-    // Parse multipart form data
+    // Parse multipart form data - Vercel has ~10MB practical limit
     const form = formidable({
-      maxFileSize: 50 * 1024 * 1024, // 50MB
+      maxFileSize: 10 * 1024 * 1024, // 10MB - safer limit for Vercel
       keepExtensions: true,
     });
 
@@ -41,6 +41,16 @@ export default async function handler(req, res) {
 
     if (!file) {
       res.status(400).json({ error: 'No file uploaded' });
+      return;
+    }
+
+    // Check file size before processing
+    if (file.size > 10 * 1024 * 1024) {
+      res.status(413).json({ 
+        error: 'File too large. Maximum size is 10MB for Vercel processing.',
+        maxSize: '10MB',
+        fileSize: `${Math.round(file.size / 1024 / 1024 * 100) / 100}MB`
+      });
       return;
     }
 

@@ -36,7 +36,7 @@ export default function FileUpload({ onResult, prompt }: FileUploadProps) {
       'text/plain': ['.txt']
     },
     maxFiles: 1,
-    maxSize: 50 * 1024 * 1024 // 50MB
+    maxSize: 50 * 1024 * 1024 // 50MB (direct N8N upload for >10MB)
   })
 
   const handleRemoveFile = () => {
@@ -96,7 +96,7 @@ export default function FileUpload({ onResult, prompt }: FileUploadProps) {
           </p>
           <p className="text-sm text-gray-500 mb-4">or click to select a file</p>
           <p className="text-xs text-gray-400">
-            Supports PDF, DOC, DOCX, and TXT files (max 10MB)
+            Supports PDF, DOC, DOCX, and TXT files (max 50MB)
           </p>
         </div>
       ) : (
