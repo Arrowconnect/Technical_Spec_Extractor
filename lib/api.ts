@@ -21,10 +21,17 @@ export async function processFile(file: File, token: string, prompt: string): Pr
     formData.append('file', file)
     formData.append('prompt', prompt)
     
+    // Create AbortController for timeout handling
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000) // 10 minute timeout
+    
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       body: formData,
+      signal: controller.signal,
     })
+    
+    clearTimeout(timeoutId)
     
     console.log('Request sent, waiting for response...')
     
@@ -71,11 +78,11 @@ export async function processFile(file: File, token: string, prompt: string): Pr
     let errorMessage = 'Failed to process file'
     
     if (error.name === 'AbortError' || error.message.includes('timeout')) {
-      errorMessage = 'Request timed out. The file processing is taking longer than expected. Your N8N workflow may still be running.'
+      errorMessage = 'Upload timeout. Large files (>100MB) may exceed server limits. Try reducing file size or contact support.'
     } else if (error.message.includes('HTTP error')) {
       errorMessage = `API Error: ${error.message}`
-    } else if (error.message.includes('fetch')) {
-      errorMessage = 'Could not connect to processing service'
+    } else if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
+      errorMessage = 'Upload failed. This may be due to file size limits or network timeout. For files >100MB, please contact support.'
     } else {
       errorMessage = error.message
     }
