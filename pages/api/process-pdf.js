@@ -8,7 +8,7 @@ export const config = {
   },
 };
 
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://n8n-tech-spec.duckdns.org/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca';
+const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://n8n.arrowpipes.site/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca';
 
 export default async function handler(req, res) {
   // Enable CORS

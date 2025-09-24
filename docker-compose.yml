@@ -7,7 +7,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_N8N_WEBHOOK_URL=https://n8n-tech-spec.duckdns.org/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca
+      - NEXT_PUBLIC_N8N_WEBHOOK_URL=https://n8n.arrowpipes.site/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca
     restart: always
     container_name: technical-spec-engine
     networks:

@@ -24,7 +24,7 @@ npm install
 Create a `.env.local` file in the root directory and add your N8N webhook URL:
 
 ```env
-NEXT_PUBLIC_N8N_WEBHOOK_URL=https://n8n-tech-spec.duckdns.org/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://n8n.arrowpipes.site/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca
 ```
 
 ### 3. Run the Application
