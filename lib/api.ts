@@ -23,7 +23,7 @@ export async function processFile(file: File, token: string, prompt: string): Pr
     
     // Create AbortController for timeout handling
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000) // 10 minute timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20 * 60 * 1000) // 20 minute timeout
     
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
