@@ -1,7 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
 
 // N8N webhook endpoint
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://n8n.arrowpipes.site/webhook/b918489b-0898-4b69-a91d-eb7277ab9dca'
+const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://n8n.arrowpipes.site/webhook/qc-a7f3e9d2-5b81-4c06-9e44-d18f62b0c3a5'
 
 export interface ProcessFileResponse {
   success: boolean
